@@ -12,14 +12,14 @@ This repository serves as a centralized location for:
 
 ## What's Included
 
-### Skills (`.augment/skills/`)
+### Skills (`skills/`)
 Skills are specialized domain knowledge packages following the agentskills.io specification:
 
 - **`github-pr-linear`**: Create GitHub PRs with Linear ticket integration and conventional commits
 
 Skills are discoverable by Augment and provide focused guidance for specific workflows.
 
-### Rules (`.augment/rules/`)
+### Rules (`rules/`)
 General coding guidelines and project conventions (if any are added in the future).
 
 ## Usage
@@ -52,10 +52,10 @@ Feel free to add new skills or improve existing ones by submitting a pull reques
 
 ### Adding a New Skill
 
-1. Create a new directory under `.augment/skills/` with a kebab-case name
+1. Create a new directory under `skills/` with a kebab-case name
 2. Add a `SKILL.md` file following the agentskills.io specification
 3. Include required frontmatter: `name` and `description`
-4. Commit and push - the skill will auto-sync to `~/.augment/rules`
+4. Commit and push - the skill will auto-sync to `~/.augment/skills`
 
 ## License
 

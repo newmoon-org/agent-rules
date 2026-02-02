@@ -25,16 +25,16 @@ if [ ! -d "$AUGMENT_RULES_DIR" ]; then
     mkdir -p "$AUGMENT_RULES_DIR"
 fi
 
-# Sync skills from .augment/skills/ to ~/.augment/skills/
-if [ -d "$REPO_DIR/.augment/skills" ]; then
-    echo "📋 Syncing skills from $REPO_DIR/.augment/skills to $AUGMENT_SKILLS_DIR"
-    rsync -av --delete "$REPO_DIR/.augment/skills/" "$AUGMENT_SKILLS_DIR/"
+# Sync skills from skills/ to ~/.augment/skills/
+if [ -d "$REPO_DIR/skills" ]; then
+    echo "📋 Syncing skills from $REPO_DIR/skills to $AUGMENT_SKILLS_DIR"
+    rsync -av --delete "$REPO_DIR/skills/" "$AUGMENT_SKILLS_DIR/"
 fi
 
-# Sync rules from .augment/rules/ to ~/.augment/rules/
-if [ -d "$REPO_DIR/.augment/rules" ]; then
-    echo "📋 Syncing rules from $REPO_DIR/.augment/rules to $AUGMENT_RULES_DIR"
-    rsync -av --delete "$REPO_DIR/.augment/rules/" "$AUGMENT_RULES_DIR/"
+# Sync rules from rules/ to ~/.augment/rules/
+if [ -d "$REPO_DIR/rules" ]; then
+    echo "📋 Syncing rules from $REPO_DIR/rules to $AUGMENT_RULES_DIR"
+    rsync -av --delete "$REPO_DIR/rules/" "$AUGMENT_RULES_DIR/"
 fi
 
 echo "✅ Sync complete!"
