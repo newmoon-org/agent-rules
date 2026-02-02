@@ -1,14 +1,23 @@
 #!/bin/bash
 
-# Sync script to copy agent rules to ~/.augment/rules
+# Sync script to copy agent skills and rules to Augment directories
+# - Skills go to ~/.augment/skills/ (user-level, available in all workspaces)
+# - Rules go to ~/.augment/rules/ (general coding guidelines)
 # Usage: ./sync-to-augment.sh
 
 set -e
 
+AUGMENT_SKILLS_DIR="$HOME/.augment/skills"
 AUGMENT_RULES_DIR="$HOME/.augment/rules"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🔄 Syncing agent rules to Augment..."
+echo "🔄 Syncing agent skills and rules to Augment..."
+
+# Create the skills directory if it doesn't exist
+if [ ! -d "$AUGMENT_SKILLS_DIR" ]; then
+    echo "📁 Creating $AUGMENT_SKILLS_DIR"
+    mkdir -p "$AUGMENT_SKILLS_DIR"
+fi
 
 # Create the rules directory if it doesn't exist
 if [ ! -d "$AUGMENT_RULES_DIR" ]; then
@@ -16,10 +25,19 @@ if [ ! -d "$AUGMENT_RULES_DIR" ]; then
     mkdir -p "$AUGMENT_RULES_DIR"
 fi
 
-# Copy all files from this repo to ~/.augment/rules
-# Exclude .git directory and this sync script
-echo "📋 Copying files from $REPO_DIR to $AUGMENT_RULES_DIR"
-rsync -av --exclude='.git' --exclude='sync-to-augment.sh' --exclude='.gitignore' "$REPO_DIR/" "$AUGMENT_RULES_DIR/"
+# Sync skills from skills/ to ~/.augment/skills/
+if [ -d "$REPO_DIR/skills" ]; then
+    echo "📋 Syncing skills from $REPO_DIR/skills to $AUGMENT_SKILLS_DIR"
+    rsync -av --delete "$REPO_DIR/skills/" "$AUGMENT_SKILLS_DIR/"
+fi
 
-echo "✅ Sync complete! Agent rules are now in $AUGMENT_RULES_DIR"
+# Sync rules from rules/ to ~/.augment/rules/
+if [ -d "$REPO_DIR/rules" ]; then
+    echo "📋 Syncing rules from $REPO_DIR/rules to $AUGMENT_RULES_DIR"
+    rsync -av --delete "$REPO_DIR/rules/" "$AUGMENT_RULES_DIR/"
+fi
+
+echo "✅ Sync complete!"
+echo "   Skills: $AUGMENT_SKILLS_DIR"
+echo "   Rules: $AUGMENT_RULES_DIR"
 
