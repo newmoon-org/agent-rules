@@ -48,7 +48,14 @@ After cloning this repository, run the sync script once:
 
 ## Contributing
 
-Feel free to add new rules or improve existing ones by submitting a pull request.
+Feel free to add new skills or improve existing ones by submitting a pull request.
+
+### Adding a New Skill
+
+1. Create a new directory under `.augment/skills/` with a kebab-case name
+2. Add a `SKILL.md` file following the agentskills.io specification
+3. Include required frontmatter: `name` and `description`
+4. Commit and push - the skill will auto-sync to `~/.augment/rules`
 
 ## License
 
