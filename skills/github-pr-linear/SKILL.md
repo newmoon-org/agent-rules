@@ -66,9 +66,28 @@ git branch --show-current
 git push -u origin BRANCH-NAME
 ```
 
-### Step 4: Create PR with Conventional Commit Title
+### Step 4: Check if Repository Has Auto-Merge Enabled
+```bash
+gh repo view --json autoMergeAllowed -q .autoMergeAllowed
+```
+
+### Step 5: Create PR with Conventional Commit Title
 ```bash
 gh pr create --title "TYPE(SCOPE): DESCRIPTION" --body "DETAILED_DESCRIPTION"
+```
+
+### Step 6: Enable Auto-Merge (if repository supports it)
+If the repository has auto-merge enabled and the user wants it:
+```bash
+gh pr merge --auto --squash
+```
+Or for merge commit:
+```bash
+gh pr merge --auto --merge
+```
+Or for rebase:
+```bash
+gh pr merge --auto --rebase
 ```
 
 ## Command Examples
@@ -107,6 +126,17 @@ gh pr create \
   --label enhancement,backend
 ```
 
+### PR with Auto-Merge Enabled
+```bash
+# Create the PR
+gh pr create \
+  --title "feat(api): add rate limiting middleware" \
+  --body "Adds configurable rate limiting to prevent API abuse."
+
+# Enable auto-merge with squash (most common)
+gh pr merge --auto --squash
+```
+
 ## Best Practices
 
 1. **Always verify** the current branch name matches a Linear ticket
@@ -117,6 +147,8 @@ gh pr create \
 6. **Add labels** if requested (use `--label` flag)
 7. **Keep scope concise** - use one or two words (e.g., `auth`, `api`, `database`)
 8. **Description should be imperative** - "add feature" not "adds feature"
+9. **Check for auto-merge** - If repository has auto-merge enabled, ask user if they want to enable it
+10. **Default to squash merge** - When enabling auto-merge, use `--squash` unless user specifies otherwise
 
 ## Common Patterns
 
@@ -131,6 +163,50 @@ gh pr create \
 - Be concise but descriptive
 - Use imperative mood ("add" not "added")
 
+## Auto-Merge
+
+### When to Use Auto-Merge
+
+Enable auto-merge when:
+- Repository has auto-merge feature enabled
+- PR has required checks configured
+- User wants the PR to merge automatically after approvals and checks pass
+
+### Auto-Merge Strategies
+
+1. **Squash** (recommended for most cases):
+   ```bash
+   gh pr merge --auto --squash
+   ```
+   - Combines all commits into one
+   - Keeps main branch history clean
+   - PR title becomes the commit message
+
+2. **Merge Commit**:
+   ```bash
+   gh pr merge --auto --merge
+   ```
+   - Preserves all commits from the PR
+   - Creates a merge commit
+   - Full history is maintained
+
+3. **Rebase**:
+   ```bash
+   gh pr merge --auto --rebase
+   ```
+   - Replays commits on top of base branch
+   - No merge commit created
+   - Linear history
+
+### Checking Auto-Merge Status
+
+To check if a repository has auto-merge enabled:
+```bash
+gh repo view --json autoMergeAllowed -q .autoMergeAllowed
+```
+
+Returns `true` if auto-merge is available, `false` otherwise.
+
 ## Error Handling
 
 If `gh pr create` fails:
@@ -138,4 +214,10 @@ If `gh pr create` fails:
 - Check if branch is pushed to remote
 - Confirm repository has remote configured
 - Ensure user has permission to create PRs in the repository
+
+If `gh pr merge --auto` fails:
+- Verify repository has auto-merge enabled
+- Check if user has permission to enable auto-merge
+- Ensure PR has been created successfully
+- Confirm required checks are configured (auto-merge won't work without them)
 
