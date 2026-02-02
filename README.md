@@ -11,7 +11,27 @@ This repository serves as a centralized location for:
 
 ## Usage
 
-To use these rules with Augment Agent, reference this repository in your project's Augment configuration.
+This repository syncs to `~/.augment/rules` where Augment Agent can access the rules.
+
+### Manual Sync
+
+To manually sync the rules to your local Augment directory:
+
+```bash
+./sync-to-augment.sh
+```
+
+### Automatic Sync
+
+A git post-commit hook is set up to automatically sync rules to `~/.augment/rules` after each commit.
+
+### Initial Setup
+
+After cloning this repository, run the sync script once to populate your Augment rules directory:
+
+```bash
+./sync-to-augment.sh
+```
 
 ## Contributing
 
