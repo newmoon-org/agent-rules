@@ -10,11 +10,15 @@ type: auto
 
 This rule ensures that all code pushed to GitHub meets quality standards by running linters, formatters, tests, and builds before pushing. This prevents broken code from entering the CI/CD pipeline and wasting time on failed builds.
 
+This rule applies to both **JavaScript/TypeScript** projects (npm/Node.js) and **Kotlin/Java** projects (Gradle).
+
 ## Required Checks Before Push
 
-Before running `git push`, you MUST complete ALL of the following checks:
+Before running `git push`, you MUST complete ALL of the following checks based on your project type:
 
-### 1. Code Formatting (Prettier)
+### 1. Code Formatting
+
+#### JavaScript/TypeScript Projects (Prettier)
 
 Run Prettier to ensure consistent code formatting:
 
@@ -30,10 +34,24 @@ npm run format
 npx prettier --write .
 ```
 
-✅ **Required:** All files must pass Prettier formatting checks
+#### Kotlin/Java Projects (ktlint)
+
+Run ktlint to ensure consistent Kotlin code formatting:
+
+```bash
+# Check formatting
+./gradlew ktlintCheck
+
+# Fix formatting issues
+./gradlew ktlintFormat
+```
+
+✅ **Required:** All files must pass formatting checks
 ❌ **Never push** code with formatting errors
 
-### 2. Linting (ESLint)
+### 2. Linting
+
+#### JavaScript/TypeScript Projects (ESLint)
 
 Run ESLint to catch code quality issues and potential bugs:
 
@@ -49,7 +67,16 @@ npm run lint:fix
 npx eslint . --fix
 ```
 
-✅ **Required:** All files must pass ESLint checks with no errors
+#### Kotlin/Java Projects (detekt)
+
+Run detekt for static code analysis:
+
+```bash
+# Run detekt
+./gradlew detekt
+```
+
+✅ **Required:** All files must pass linting checks with no errors
 ⚠️ **Warnings:** Address warnings when possible, but errors are blocking
 
 ### 3. Type Checking (TypeScript)
@@ -68,6 +95,8 @@ npx tsc --noEmit
 
 ### 4. Tests
 
+#### JavaScript/TypeScript Projects
+
 Run all tests to ensure functionality is not broken:
 
 ```bash
@@ -83,11 +112,25 @@ npm run test:watch
 npm run test:coverage
 ```
 
+#### Kotlin/Java Projects
+
+Run all tests using Gradle:
+
+```bash
+# Run all tests
+./gradlew test
+
+# Run tests with coverage
+./gradlew test jacocoTestReport
+```
+
 ✅ **Required:** All tests must pass
 ❌ **Never push** code with failing tests
 📋 **Note:** Add tests for new functionality
 
 ### 5. Build
+
+#### JavaScript/TypeScript Projects
 
 Ensure the project builds successfully:
 
@@ -101,11 +144,28 @@ npm run build
 # For other frameworks, use appropriate build command
 ```
 
+#### Kotlin/Java Projects
+
+Build the project using Gradle:
+
+```bash
+# Build the project
+./gradlew build
+
+# Build without running tests (if tests already run separately)
+./gradlew assemble
+
+# Clean and build
+./gradlew clean build
+```
+
 ✅ **Required:** Build must complete without errors
 ❌ **Never push** code that doesn't build
 ⚠️ **Build warnings:** Review and address when possible
 
 ## Complete Pre-Push Workflow
+
+### JavaScript/TypeScript Projects
 
 Follow this workflow before every push:
 
@@ -136,7 +196,37 @@ git commit -m "chore: apply formatting and linting fixes"
 git push
 ```
 
+### Kotlin/Java Projects (Gradle)
+
+Follow this workflow before every push:
+
+```bash
+# 1. Ensure you're on your feature branch
+git branch --show-current
+
+# 2. Run formatting
+./gradlew ktlintFormat
+
+# 3. Run linting/static analysis
+./gradlew detekt
+
+# 4. Run tests
+./gradlew test
+
+# 5. Run build
+./gradlew build
+
+# 6. If all checks pass, commit any formatting fixes
+git add .
+git commit -m "chore: apply formatting and linting fixes"
+
+# 7. Push to feature branch
+git push
+```
+
 ## Automated Pre-Push Script
+
+### JavaScript/TypeScript Projects
 
 Consider creating a pre-push script in `package.json`:
 
@@ -161,7 +251,27 @@ Then run before pushing:
 npm run pre-push
 ```
 
+### Kotlin/Java Projects (Gradle)
+
+Create a custom Gradle task in `build.gradle.kts`:
+
+```kotlin
+tasks.register("prePush") {
+    dependsOn("ktlintFormat", "detekt", "test", "build")
+    group = "verification"
+    description = "Run all pre-push quality checks"
+}
+```
+
+Then run before pushing:
+
+```bash
+./gradlew prePush
+```
+
 ## Git Pre-Push Hook (Optional)
+
+### JavaScript/TypeScript Projects
 
 For automatic enforcement, create a git pre-push hook at `.git/hooks/pre-push`:
 
@@ -190,9 +300,40 @@ Make it executable:
 chmod +x .git/hooks/pre-push
 ```
 
+### Kotlin/Java Projects (Gradle)
+
+For automatic enforcement, create a git pre-push hook at `.git/hooks/pre-push`:
+
+```bash
+#!/bin/sh
+
+echo "🔍 Running pre-push quality checks..."
+
+# Run checks
+./gradlew ktlintCheck detekt test build
+
+# Capture exit code
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+  echo "❌ Pre-push checks failed. Please fix the issues before pushing."
+  exit 1
+fi
+
+echo "✅ All pre-push checks passed!"
+exit 0
+```
+
+Make it executable:
+```bash
+chmod +x .git/hooks/pre-push
+```
+
 ## Handling Check Failures
 
 ### Formatting Failures
+
+**JavaScript/TypeScript:**
 ```bash
 # Auto-fix formatting
 npm run format
@@ -200,7 +341,17 @@ git add .
 git commit -m "chore: fix formatting"
 ```
 
+**Kotlin/Java:**
+```bash
+# Auto-fix formatting
+./gradlew ktlintFormat
+git add .
+git commit -m "chore: fix formatting"
+```
+
 ### Linting Failures
+
+**JavaScript/TypeScript:**
 ```bash
 # Auto-fix linting issues
 npm run lint:fix
@@ -208,6 +359,14 @@ git add .
 git commit -m "chore: fix linting issues"
 
 # For manual fixes, address each error and commit
+```
+
+**Kotlin/Java:**
+```bash
+# Review detekt report (usually in build/reports/detekt/)
+# Fix issues manually and commit
+git add .
+git commit -m "chore: fix linting issues"
 ```
 
 ### Type Check Failures
@@ -260,6 +419,8 @@ These checks should also run in CI/CD:
 
 ## Summary Checklist
 
+### JavaScript/TypeScript Projects
+
 Before every push, verify:
 
 - ✅ Prettier formatting applied
@@ -268,6 +429,18 @@ Before every push, verify:
 - ✅ All tests pass
 - ✅ Build completes successfully
 - ✅ No console errors or warnings in build output
+- ✅ Changes committed with proper commit message
+- ✅ On correct feature branch (not main)
+
+### Kotlin/Java Projects
+
+Before every push, verify:
+
+- ✅ ktlint formatting applied
+- ✅ detekt passes with no errors
+- ✅ All tests pass
+- ✅ Gradle build completes successfully
+- ✅ No build errors or warnings
 - ✅ Changes committed with proper commit message
 - ✅ On correct feature branch (not main)
 
